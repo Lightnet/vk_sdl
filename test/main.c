@@ -7,9 +7,9 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
-#include <SDL3_image/SDL_image.h>
-#include <SDL3_mixer/SDL_mixer.h>
-#include <SDL3_ttf/SDL_ttf.h>
+//#include <SDL3_image/SDL_image.h>
+//#include <SDL3_mixer/SDL_mixer.h>
+//#include <SDL3_ttf/SDL_ttf.h>
 
 #include <vk_mem_alloc.h>
 
@@ -128,7 +128,12 @@ void createVulkanContext(VulkanContext *ctx, Uint32 apiVersion) {
 
 void bindWindow(VulkanContext *context, SDL_Window *window) {
     if (context->surface) return;
-    SDL_Vulkan_CreateSurface(window, context->instance, &context->surface);
+    SDL_Vulkan_CreateSurface(
+      window, 
+      context->instance, 
+      NULL,
+      &context->surface
+    );
 }
 
 void unbindWindow(VulkanContext *context) {
@@ -138,16 +143,20 @@ void unbindWindow(VulkanContext *context) {
 }
 
 int main(int argc, char **argv) {
-    SDL_Init(SDL_INIT_EVERYTHING);
-    IMG_Init(IMG_INIT_PNG);
-    Mix_Init(MIX_INIT_MP3);
-    TTF_Init();
-    enet_initialize();
+    //SDL_Init(0);
+    // https://github.com/libsdl-org/SDL/blob/main/docs/README-migration.md
+    // SDL_INIT_EVERYTHING is remove
+    //SDL_Init(SDL_INIT_EVERYTHING); //sdl 3 is remove
+    SDL_Init(SDL_INIT_VIDEO);
+    //IMG_Init(IMG_INIT_PNG);
+    //Mix_Init(MIX_INIT_MP3);
+    //TTF_Init();
+    //enet_initialize();
 
     App app;
-    app.window = SDL_CreateWindow("Hello World", 800, 600,
+    app.window = SDL_CreateWindow("SDL3 c imgui", 800, 600,
                                   SDL_WINDOW_VULKAN | SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
-
+    app.shouldClose = false;//set for loop else it would close
     createVulkanContext(&app.context, VK_API_VERSION_1_2);
 
     ImGuiContext *context = igCreateContext(NULL);
